@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS trackDB;
 CREATE DATABASE trackDB;
 
 USE trackDB;
@@ -21,7 +22,7 @@ CREATE TABLE user_orders (
 CREATE TABLE qr_orders (
     qr_id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
-    description TEXT,
+    description MEDIUMTEXT,
     url LONGTEXT,
     CONSTRAINT FK_QrOrder FOREIGN KEY (order_id)
     REFERENCES user_orders(order_id)

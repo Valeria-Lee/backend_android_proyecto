@@ -42,8 +42,8 @@ switch ($method) {
         if ($uri[1] === 'orders') {
 			getUserOrders($conn, $user_id);
 		} elseif ($uri[1] === 'qr_orders') {
-            $qr_url = $_GET['url'] ?? null; // para obtenerlo de la url
-			getOrderByQR($conn, $qr_url);
+            $description = $_GET['description'] ?? null; // para obtenerlo de la url
+			getOrderByQR($conn, $description);
 		}
         break;
 
@@ -56,9 +56,9 @@ switch ($method) {
 		break;
 
     case 'PATCH':
-        if ($uri[1] === 'orders') {
-            $qr_url = $_GET['url'] ?? null;
-            checkOrderByQR($conn, $qr_url);
+        if ($uri[1] === 'qr_orders') {
+            $description = $_GET['description'] ?? null;
+            checkOrderByQR($conn, $description);
         }
         break;
 
@@ -95,49 +95,43 @@ switch ($method) {
     }
 
     // when a user scans a qr, this function identify which 
-    function getOrderByQR($conn, $qr_url) {
-        if (empty($qr_url)) {
+    function getOrderByQR($conn, $description) {
+        if (empty($description)) {
             http_response_code(400);
             echo json_encode(["error" => "QR requerido"]);
             return;
         }
-
-        if (!filter_var($qr_url, FILTER_VALIDATE_URL)) {
-            http_response_code(400);
-            echo json_encode(["error" => "URL no válida"]);
-            return;
-        }
-
-        $check_query = "SELECT url FROM qr_orders WHERE url = ?";
+    
+        $check_query = "SELECT order_id FROM qr_orders WHERE description = ?";
         $stmt_check = mysqli_prepare($conn, $check_query);
-        mysqli_stmt_bind_param($stmt_check, 's', $qr_url);
+        mysqli_stmt_bind_param($stmt_check, 's', $description);
         mysqli_stmt_execute($stmt_check);
         $result_check = mysqli_stmt_get_result($stmt_check);
-
-        if (mysqli_num_rows($result_check) == 0) {
-            // si no existe la URL en qr_orders
-            http_response_code(404);
-            echo json_encode(["error" => "QR no encontrado en la base de datos"]);
-            return;
-        }
-        
-        $query = "SELECT uo.order_id, uo.latitude, uo.longitude, uo.delivered
-                  FROM qr_orders qo 
-                  JOIN user_orders uo ON qo.order_id = uo.order_id 
-                  WHERE qo.url = ?";
-        $stmt = mysqli_prepare($conn, $query);
-        mysqli_stmt_bind_param($stmt, 's', $qr_url);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
     
-        if ($row = mysqli_fetch_assoc($result)) {
-            http_response_code(200);
-            echo json_encode($row);
+        if ($row_check = mysqli_fetch_assoc($result_check)) {
+            $order_id = $row_check['order_id'];
+    
+            $query = "SELECT order_id, latitude, longitude, delivered 
+                      FROM user_orders 
+                      WHERE order_id = ?";
+            $stmt = mysqli_prepare($conn, $query);
+            mysqli_stmt_bind_param($stmt, 'i', $order_id);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+    
+            if ($row = mysqli_fetch_assoc($result)) {
+                http_response_code(200);
+                header('Content-Type: application/json');
+                echo json_encode($row);
+            } else {
+                http_response_code(404);
+                echo json_encode(["error" => "Orden no encontrada"]);
+            }
         } else {
             http_response_code(404);
-            echo json_encode(["error" => "Orden no encontrada"]);
+            echo json_encode(["error" => "QR no encontrado en la base de datos"]);
         }
-    }
+    }    
 
     // create a new user.
     function register($conn) {
@@ -207,10 +201,10 @@ switch ($method) {
     }
 
     // mark orders as delivered.
-    function checkOrderByQR($conn, $qr_url) {
+    function checkOrderByQR($conn, $description) {
         $data = json_decode(file_get_contents("php://input"), true);
 
-        if (!$qr_url) {
+        if (!$description) {
             http_response_code(400);
             echo json_encode(["error" => "QR requerido"]);
             return;
@@ -219,10 +213,10 @@ switch ($method) {
         $query = "UPDATE user_orders uo 
                 JOIN qr_orders qo ON uo.order_id = qo.order_id 
                 SET uo.delivered = TRUE 
-                WHERE qo.url = ?";
+                WHERE qo.description = ?";
 
         $stmt = mysqli_prepare($conn, $query);
-        mysqli_stmt_bind_param($stmt, 's', $qr_url);
+        mysqli_stmt_bind_param($stmt, 's', $description);
 
         if (mysqli_stmt_execute($stmt)) {
             http_response_code(200);
