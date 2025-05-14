@@ -102,9 +102,25 @@ switch ($method) {
             return;
         }
 
-        $qr_url = urldecode($qr_url);
-        error_log("Buscando QR: " . $qr_url);
-    
+        if (!filter_var($qr_url, FILTER_VALIDATE_URL)) {
+            http_response_code(400);
+            echo json_encode(["error" => "URL no válida"]);
+            return;
+        }
+
+        $check_query = "SELECT url FROM qr_orders WHERE url = ?";
+        $stmt_check = mysqli_prepare($conn, $check_query);
+        mysqli_stmt_bind_param($stmt_check, 's', $qr_url);
+        mysqli_stmt_execute($stmt_check);
+        $result_check = mysqli_stmt_get_result($stmt_check);
+
+        if (mysqli_num_rows($result_check) == 0) {
+            // si no existe la URL en qr_orders
+            http_response_code(404);
+            echo json_encode(["error" => "QR no encontrado en la base de datos"]);
+            return;
+        }
+        
         $query = "SELECT uo.order_id, uo.latitude, uo.longitude, uo.delivered
                   FROM qr_orders qo 
                   JOIN user_orders uo ON qo.order_id = uo.order_id 
