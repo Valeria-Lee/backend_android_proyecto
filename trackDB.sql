@@ -60,9 +60,3 @@ INSERT INTO qr_orders (order_id, url)
     (8, 'https://www.amazon.com.mx/Sabritas-Cheetos-Xtra-Flamin-240g/dp/B0BNL253VL/ref=sr_1_1?__mk_es_MX=%C3%85M%C3%85%C5%BD%C3%95%C3%91&dib=eyJ2IjoiMSJ9.WxJFwgRQCsQl534YbnwfA5ABNTpstTyq__JQO8Sz3PgVRjFyFDiyEniKKzBj5uL-tezsAxQ9sgBq6F5phKwOGfD7DTgRN0kw8qEOR9I62aofIpmk7k-cO9XegqH1rdFLSJZdMVlFtAe-w1CdIPCYzVgISbOwRnwDKOATczt_oYQMY_BUddz8hy4E7IkHOPlWQgJ79E-U0GPsAsZlLWiOAl_S4A1vB3_KgmvYB8I_JCfV-UAjA9Om96TyMRBkGiW_NeOuqFZ8_wCwtwhGHiGyt48lBH3chTAEZmHRSljpcpQ.Me_-809d5n986cOKikQHaTBQ21T8HrT0aaQArQcqi7s&dib_tag=se&keywords=cheetos&qid=1747006397&s=grocery&sr=1-1'),
     (9, 'https://www.amazon.com.mx/JBL-Port%C3%A1til-Bluetooth-Reproducci%C3%B3n-Resistente/dp/B0CTNWBT1Z?ref=dlx_deals_dg_dcl_B0CTNWBT1Z_dt_sl14_6c_pi&pf_rd_r=YRDKRP6H3VSCE5102AJC&pf_rd_p=95f51032-b2e2-4dbc-9604-3b494fd45a6c&th=1'),
     (10, 'https://www.amazon.com.mx/LG-Monitor-29WQ500-Pulgadas-Contrast/dp/B0C3WZ4NNJ?ref=dlx_deals_dg_dcl_B0C3WZ4NNJ_dt_sl14_6c_pi&pf_rd_r=TDDQATY63AM1M83CVGDA&pf_rd_p=95f51032-b2e2-4dbc-9604-3b494fd45a6c');
-
-
-
-
-
-
